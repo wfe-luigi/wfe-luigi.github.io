@@ -20,7 +20,7 @@ var vm = {
             
             list.forEach(function(value,index){
                 var price = item_list[index].price;
-                if (select_panel.moneyInsert.value >= price) {
+                if (vm.select_panel.moneyInsert.value >= price) {
                     value.classList.add("yellow");
                 }
                 else value.classList.remove("yellow");
@@ -29,22 +29,23 @@ var vm = {
         },
         buyable : function(money_insert,index){
             if(item_list.length < index || index <= 0){
-                return message[1];
+                return vm.message[1];
             }
             else if(item_list[index-1].price > money_insert){
-                return message[2];
+                return vm.message[2];
             }
-            else return message[0];
+            else return vm.message[0];
         }
     },
 
     select_panel : {
         timer : null,
-        clickButtonWindow : document.querySelector(".button_clicked"),
-        statusLog : document.querySelector(".status_log"),
-        moneyInsert : document.querySelector(".money_insert"),
-        selectButton : document.querySelector(".select_button"),
         init : function(){
+            this.clickButtonWindow = document.querySelector(".button_clicked");
+            this.statusLog = document.querySelector(".status_log");
+            this.moneyInsert = document.querySelector(".money_insert");
+            this.selectButton = document.querySelector(".select_button");
+            
             this.setSelectNumber();
         },
         setInsertMoney : function(arg){
@@ -69,20 +70,20 @@ var vm = {
         },
         executeSelection : function(index){
             var flag = null;
-            index && (flag = item_panel.buyable(this.moneyInsert.value,index));
+            index && (flag = vm.item_panel.buyable(this.moneyInsert.value,index));
             
             if(this.clickButtonWindow.value == ""){//반환
                 this.addLog(this.moneyInsert.value + "원 반환\n");
-                money_panel.moneyHave.value = parseInt(money_panel.moneyHave.value)+ parseInt(this.moneyInsert.value);
+                vm.money_panel.moneyHave.value = parseInt(vm.money_panel.moneyHave.value)+ parseInt(this.moneyInsert.value);
                 this.moneyInsert.value = "0";
-                item_panel.highLighting();
-                money_panel.refreshWallet();
+                vm.item_panel.highLighting();
+                vm.money_panel.refreshWallet();
             }
-            else if(!message.indexOf(flag)){//구매가능
+            else if(!vm.message.indexOf(flag)){//구매가능
                 this.moneyInsert.value -= item_list[index-1].price;
                 this.clickButtonWindow.value = "";
                 this.addLog(item_list[index-1].name + " 선택됨\n");
-                item_panel.highLighting();
+                vm.item_panel.highLighting();
 
                 clearTimeout(this.timer);
                 this.timer = setTimeout(this.executeSelection.bind(this), 3000);
@@ -98,10 +99,11 @@ var vm = {
     },
 
     money_panel : {
-        moneyHave :document.querySelector(".money_have"),
-        moneyButton : document.querySelector(".money_button"),
-        refreshButton : document.querySelector(".refreshWallet"),
         init : function() {
+            this.moneyHave = document.querySelector(".money_have");
+            this.moneyButton = document.querySelector(".money_button");
+            this.refreshButton = document.querySelector(".refreshWallet");
+            
             this.makeButtonList();
             this.refreshWallet();
             this.clickMoneyButton();
@@ -121,12 +123,12 @@ var vm = {
             this.moneyButton.addEventListener("click",function(e){
                 if (e.target && e.target.nodeName == "BUTTON"){
                     var value = button_list[e.target.dataset.value].value;
-                    select_panel.addLog(e.target.innerText+"이 투입됨\n");
+                    vm.select_panel.addLog(e.target.innerText+"이 투입됨\n");
                     
                     this.setHaveMoney(-value);
-                    select_panel.setInsertMoney(value);
+                    vm.select_panel.setInsertMoney(value);
                     this.refreshWallet();
-                    item_panel.highLighting();
+                    vm.item_panel.highLighting();
                 }
             }.bind(this)); 
         },
@@ -146,7 +148,6 @@ var vm = {
 }
 
 function init(){
-    console.log(document);
     vm.item_panel.init();
     vm.select_panel.init();
     vm.money_panel.init();
